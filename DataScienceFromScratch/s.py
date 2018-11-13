@@ -390,15 +390,73 @@ def most_popular_interests(user_interests, max_results=5):
 most_popular_interests(users_interests[0],3)
 
 
+unique_interests = sorted(list({interest
+                                for user_interests in users_interests
+                                for interest in user_interests}))
 
 
+unique_interests
+
+def make_user_interest_vector(user_interests):
+    return [1 if interest in user_interests else 0
+            for interest in unique_interests]
+
+# map this function against the list of lists of interests
+
+user_interest_matrix = map(make_user_interest_vector, users_interests)
+
+# dot product
+
+def dot(v, w):
+    # v_1*w_1 + v_n*w_n
+    return sum(v_i * w_i
+               for v_i, w_i in zip(v,w))
 
 
+# measures angle btw v and w
+def cosine_similarity(v, w):
+    return dot(v, w) / math.sqrt(dot(v, v) * dot(w, w))
+
+# pairwise similarities btw all the users
+user_similarities = [[cosine_similarity(interest_vector_i, interest_vector_j)
+                      for interest_vector_j in user_interest_matrix]
+                      for interest_vector_i in user_interest_matrix]
 
 
+# similarities bwt i and j
+user_similarities[0][9]
+# share interests in Javam Hadoop, Big Data
+
+user_similarities[0][8]
+# Big Data
+
+# in particular user_similarities[i] is the user i's similarities to every other user
+
+# find most similar user to a given user
+# not include the user himself, no user with zero similarity, sort high to low
+def most_similar_users_to(user_id):
+    pairs = [(other_user_id, similarity)
+            for other_user_id, similarity in
+                enumerate(user_similarities[user_id])
+            if user_id != other_user_id and similarity > 0]
+    
+    return sorted(pairs,
+                  key = lambda (_, similarity): similarity,
+                  reverse = True)
 
 
+most_similar_users_to(0)
 
+# suggest new interests to users
+def user_based_suggestions(user_id, include_current_interests=False):
+    # sum up the similarties
+    suggestions = defaultdict(float)
+    for other_user_id, similarity in most_similar_users_to(user_id):
+        for interest in users_interests[other_user_id]:
+            suggestions[interest] += similarity 
+    
+    # convert them to a sorted list
+    
 
 
 
