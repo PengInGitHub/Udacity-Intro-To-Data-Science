@@ -477,6 +477,10 @@ class Table:
         self.rows.append(row_dict)
 
 
-
+def update(self, updates, predicate):
+    for row in self.rows:
+        if predicate(row):
+            for column, new_value in updates.iteritems():
+                row[column] = new_value
 
 
