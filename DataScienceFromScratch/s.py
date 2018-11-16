@@ -484,3 +484,7 @@ def update(self, updates, predicate):
                 row[column] = new_value
 
 
+def delete(self, predicate=lambda row: True):
+    """delete all rows matching predicate
+    or all rows if no predicate supplied"""
+    self.rows = [row for row in self.rows if not(predicate(row))]
